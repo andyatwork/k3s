@@ -197,13 +197,17 @@ func (e *Embedded) Kubelet(ctx context.Context, args []string) error {
 	command.SetArgs(args)
 
 	go func() {
-		// Soft-wait: don't block kubelet startup on API server readiness.
-		// The kubelet can manage static pods without an API server; API-dependent
-		// features will retry using the kubelet's built-in backoff logic.
-		select {
-		case <-e.APIServerReadyChan():
-		default:
-			logrus.Warn("Starting kubelet before apiserver is ready; static pods will start but API-dependent features will retry until the apiserver becomes available")
+		if e.nodeConfig.AgentConfig.KubeletSoftRetry {
+			// Soft-wait: don't block kubelet startup on API server readiness.
+			// The kubelet can manage static pods without an API server; API-dependent
+			// features will retry using the kubelet's built-in backoff logic.
+			select {
+			case <-e.APIServerReadyChan():
+			default:
+				logrus.Warn("Starting kubelet before apiserver is ready; static pods will start but API-dependent features will retry until the apiserver becomes available")
+			}
+		} else {
+			<-e.APIServerReadyChan()
 		}
 		defer func() {
 			if err := recover(); err != nil {

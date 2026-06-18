@@ -46,6 +46,7 @@ type Agent struct {
 	WithNodeID               bool
 	EnableSELinux            bool
 	ProtectKernelDefaults    bool
+	KubeletSoftRetry         bool
 	ClusterReset             bool
 	PrivateRegistry          string
 	SystemDefaultRegistry    string
@@ -109,6 +110,11 @@ var (
 		Name:        "protect-kernel-defaults",
 		Usage:       "(agent/node) Kernel tuning behavior. If set, error if kernel tunables are different than kubelet defaults.",
 		Destination: &AgentConfig.ProtectKernelDefaults,
+	}
+	KubeletSoftRetryFlag = &cli.BoolFlag{
+		Name:        "kubelet-soft-retry",
+		Usage:       "(agent/node) (experimental) Start kubelet before apiserver is ready; API-dependent kubelet operations will retry until apiserver is available",
+		Destination: &AgentConfig.KubeletSoftRetry,
 	}
 	SELinuxFlag = &cli.BoolFlag{
 		Name:        "selinux",
@@ -302,6 +308,7 @@ func NewAgentCommand(action func(ctx *cli.Context) error) *cli.Command {
 			NodeTaints,
 			ImageCredProvBinDirFlag,
 			ImageCredProvConfigFlag,
+			KubeletSoftRetryFlag,
 			SELinuxFlag,
 			LBServerPortFlag,
 			ProtectKernelDefaultsFlag,
