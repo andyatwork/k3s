@@ -157,6 +157,7 @@ type Agent struct {
 	CipherSuites            []string
 	Rootless                bool
 	ProtectKernelDefaults   bool
+	KubeletSoftRetry        bool
 	DisableServiceLB        bool
 	EnableIPv4              bool
 	EnableIPv6              bool

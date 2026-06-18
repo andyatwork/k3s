@@ -183,6 +183,23 @@ sudo k3s kubectl get nodes
 sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}
 ```
 
+Kubelet startup behavior
+---------------
+
+By default, kubelet startup blocks until the API server is ready. This preserves the historic startup behavior.
+
+If you want kubelet to start early (allowing static pods and local kubelet functionality to begin while API-dependent operations retry), enable the experimental feature gate:
+
+```bash
+sudo k3s server --kubelet-soft-retry
+```
+
+or on an agent:
+
+```bash
+sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN} --kubelet-soft-retry
+```
+
 Contributing
 ------------
 
